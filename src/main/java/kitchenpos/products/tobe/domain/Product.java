@@ -4,8 +4,12 @@ import java.util.Objects;
 import java.util.UUID;
 import kitchenpos.common.domain.DisplayedName;
 import kitchenpos.common.domain.Money;
+import kitchenpos.products.tobe.domain.event.ProductPriceChangedPriceEvent;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
-public final class Product {
+
+// AbstractAggregateRoot로 이벤트 발생시 spring data repository의 save() 메서드를 명시적으로 사용해야함
+public final class Product extends AbstractAggregateRoot<Product> {
 
     private final ProductId id;
     private final DisplayedName name;
@@ -33,6 +37,15 @@ public final class Product {
     public void changePrice(Money price) {
         validPrice(price);
         this.price = price;
+        registerEvent(new ProductPriceChangedPriceEvent(this));
+    }
+
+    public ProductId getId() {
+        return id;
+    }
+
+    public Money getPrice() {
+        return price;
     }
 
     @Override
